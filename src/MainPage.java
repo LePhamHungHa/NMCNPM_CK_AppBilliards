@@ -47,7 +47,7 @@ public class MainPage extends JFrame {
         JPanel tablesPanel = createTablesPanel(); 
         mainPanel.add(tablesPanel, BorderLayout.CENTER);
 
-        tableDetailsPanel = createTableDetailsPanel(); // CHi tiết các bàn
+        tableDetailsPanel = createTableDetailsPanel(); // Chi tiết các bàn
         mainPanel.add(tableDetailsPanel, BorderLayout.EAST);
 
         add(mainPanel);
@@ -656,18 +656,55 @@ public class MainPage extends JFrame {
         removeDialog.setSize(300, 150);
         removeDialog.setLocationRelativeTo(this);
         removeDialog.setLayout(new BorderLayout(10, 10));
+        removeDialog.getContentPane().setBackground(Color.WHITE);
 
-        JPanel inputPanel = new JPanel(new FlowLayout());
+        JPanel inputPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        inputPanel.setBackground(Color.WHITE);
         JLabel label = new JLabel("Nhập số bàn muốn xóa:");
+        label.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         JTextField tableField = new JTextField(5);
+        tableField.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        tableField.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(new Color(200, 200, 200)),
+            BorderFactory.createEmptyBorder(5, 5, 5, 5)
+        ));
         inputPanel.add(label);
         inputPanel.add(tableField);
 
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        JButton removeButton = new JButton("Xóa");
-        JButton cancelButton = new JButton("Hủy");
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
+        buttonPanel.setBackground(Color.WHITE);
 
-        removeButton.addActionListener(e -> {
+        JButton okButton = new JButton("OK");
+        okButton.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        okButton.setBackground(new Color(33, 150, 243));
+        okButton.setForeground(Color.BLACK);
+        okButton.setFocusPainted(false);
+        okButton.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        okButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                okButton.setBackground(new Color(25, 118, 210));
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                okButton.setBackground(new Color(33, 150, 243));
+            }
+        });
+
+        JButton cancelButton = new JButton("Hủy");
+        cancelButton.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        cancelButton.setBackground(new Color(244, 67, 54));
+        cancelButton.setForeground(Color.BLACK);
+        cancelButton.setFocusPainted(false);
+        cancelButton.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        cancelButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                cancelButton.setBackground(new Color(211, 47, 47));
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                cancelButton.setBackground(new Color(244, 67, 54));
+            }
+        });
+
+        okButton.addActionListener(e -> {
             try {
                 int tableNumber = Integer.parseInt(tableField.getText().trim());
                 List<DatabaseHelper.Table> tables = dbHelper.getAllTables();
@@ -694,6 +731,9 @@ public class MainPage extends JFrame {
         });
 
         cancelButton.addActionListener(e -> removeDialog.dispose());
+
+        buttonPanel.add(okButton);
+        buttonPanel.add(cancelButton);
 
         removeDialog.add(inputPanel, BorderLayout.CENTER);
         removeDialog.add(buttonPanel, BorderLayout.SOUTH);
