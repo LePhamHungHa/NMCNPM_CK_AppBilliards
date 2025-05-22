@@ -328,7 +328,12 @@ public class AccountLogin extends JFrame {
         }
 
         if (isAccountExists(id)) {
-            JOptionPane.showMessageDialog(this, "Tài khoản đã tồn tại, vui lòng chọn ID khác.");
+            JOptionPane.showMessageDialog(this, "Tài khoản với ID " + id + " đã tồn tại, vui lòng chọn ID khác.");
+            return;
+        }
+
+        if (isUsernameExists(name)) {
+            JOptionPane.showMessageDialog(this, "Tên tài khoản " + name + " đã tồn tại, vui lòng chọn tên tài khoản khác.");
             return;
         }
 
@@ -371,7 +376,23 @@ public class AccountLogin extends JFrame {
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Đã xảy ra lỗi khi kiểm tra tài khoản.");
+            JOptionPane.showMessageDialog(this, "Đã xảy ra lỗi khi kiểm tra ID tài khoản.");
+        }
+        return false;
+    }
+
+    private boolean isUsernameExists(String username) {
+        try (Connection connection = DatabaseConnection.getConnection()) {
+            String query = "SELECT COUNT(*) FROM users WHERE username = ?";
+            PreparedStatement stmt = connection.prepareStatement(query);
+            stmt.setString(1, username);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Đã xảy ra lỗi khi kiểm tra tên tài khoản.");
         }
         return false;
     }
