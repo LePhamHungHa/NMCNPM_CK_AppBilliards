@@ -14,11 +14,13 @@ public class InvoicePage extends JFrame {
     private User currentUser; // Thông tin người dùng đang đăng nhập
     private MainPage mainPage; // Tham chiếu đến MainPage để tính chi phí giờ chơi
 
-    // Giao diện hóa đơn
+    // Constructor: Khởi tạo giao diện hóa đơn cho một bàn cụ thể
     public InvoicePage(int tableNumber, TableInfo tableInfo, User currentUser, MainPage mainPage) {
         this.mainPage = mainPage; // Lưu tham chiếu đến MainPage
+        
         ImageIcon logoIcon = new ImageIcon("/Img/logo_pool.png");
         this.setIconImage(logoIcon.getImage());
+        // Đặt tiêu đề và kích thước cửa sổ
         setTitle("Hóa Đơn - Bàn " + tableNumber);
         setSize(500, 600);
         setLocationRelativeTo(null);
@@ -28,17 +30,19 @@ public class InvoicePage extends JFrame {
         // Tạo mã hóa đơn ngẫu nhiên
         String invoiceCode = generateInvoiceCode();
 
+        // Tạo panel chính với bố cục BorderLayout và nền trắng
         JPanel contentPane = new JPanel(new BorderLayout(15, 15));
         contentPane.setBackground(Color.WHITE);
         contentPane.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
         setContentPane(contentPane);
 
-        // Phần tiêu đề hóa đơn
+        // Tạo phần tiêu đề hóa đơn
         JPanel headerPanel = new JPanel();
         headerPanel.setLayout(new BoxLayout(headerPanel, BoxLayout.Y_AXIS));
         headerPanel.setBackground(Color.WHITE);
         headerPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
+        // Thêm thông tin CLB Billiards
         JLabel clubNameLabel = new JLabel("LPHH BILLIARDS");
         clubNameLabel.setFont(new Font("Segoe UI", Font.BOLD, 20));
         clubNameLabel.setForeground(Color.BLACK);
@@ -59,6 +63,7 @@ public class InvoicePage extends JFrame {
 
         headerPanel.add(Box.createVerticalStrut(10));
 
+        // Thêm thông tin bàn, mã hóa đơn và người in
         JPanel tableAndInvoicePanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
         tableAndInvoicePanel.setBackground(Color.WHITE);
 
@@ -79,6 +84,7 @@ public class InvoicePage extends JFrame {
 
         headerPanel.add(tableAndInvoicePanel);
 
+        // Thêm thông tin thời gian bắt đầu và kết thúc
         JPanel timePanel = new JPanel(new GridLayout(2, 1, 0, 5));
         timePanel.setBackground(Color.WHITE);
         JLabel startTimeLabel = new JLabel("Giờ bắt đầu: " + formatDate(tableInfo.startTime));
@@ -94,7 +100,7 @@ public class InvoicePage extends JFrame {
 
         contentPane.add(headerPanel, BorderLayout.NORTH);
 
-        // Bảng hiển thị danh sách các món đã order
+        // Tạo bảng hiển thị danh sách các món đã order
         String[] columns = {"Tên", "SL", "Giá", "Tổng"};
         DefaultTableModel model = new DefaultTableModel(columns, 0) {
             @Override
@@ -111,11 +117,12 @@ public class InvoicePage extends JFrame {
         orderTable.getTableHeader().setForeground(Color.BLACK);
         orderTable.getTableHeader().setBackground(new Color(240, 240, 240));
 
-        //  Duyệt qua danh sách các món đã gọi và hiển thị từng món lên bảng
+        // Duyệt qua danh sách các món đã gọi và thêm vào bảng
         for (Map.Entry<String, Double> entry : tableInfo.orders.entrySet()) {
             String item = entry.getKey();
             double totalPrice = entry.getValue();
 
+            // Tách thông tin món ăn và tính số lượng
             String[] itemParts = item.split(":");
             String itemName = itemParts[0].trim();
             String priceString = itemParts[1].trim().split(" ")[0];
@@ -129,7 +136,7 @@ public class InvoicePage extends JFrame {
         scrollPane.setBorder(BorderFactory.createLineBorder(new Color(200, 200, 200)));
         contentPane.add(scrollPane, BorderLayout.CENTER);
 
-        // Phần chân trang hiển thị tổng tiền và nút in hóa đơn
+        // Tạo phần chân trang hiển thị tổng tiền và nút in hóa đơn
         JPanel footerPanel = new JPanel();
         footerPanel.setLayout(new BoxLayout(footerPanel, BoxLayout.Y_AXIS));
         footerPanel.setBackground(Color.WHITE);
@@ -138,7 +145,8 @@ public class InvoicePage extends JFrame {
         totalPanel.setBackground(Color.WHITE);
         totalPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
 
-        double playCost = (mainPage != null) ? mainPage.calculatePlayCostForTable(tableNumber) : 0.0; // Kiểm tra null để tránh lỗi
+        // Tính chi phí giờ chơi từ MainPage (kiểm tra null để tránh lỗi)
+        double playCost = (mainPage != null) ? mainPage.calculatePlayCostForTable(tableNumber) : 0.0;
         JLabel serviceTotalLabel = new JLabel("Tổng dịch vụ: " + tableInfo.orderTotal + " VND");
         serviceTotalLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         serviceTotalLabel.setForeground(Color.BLACK);
@@ -155,6 +163,7 @@ public class InvoicePage extends JFrame {
 
         footerPanel.add(totalPanel);
 
+        // Tạo nút in hóa đơn với hiệu ứng hover
         JButton printButton = new JButton("In Hóa Đơn");
         printButton.setFont(new Font("Segoe UI", Font.BOLD, 14));
         printButton.setBackground(new Color(33, 150, 243));
@@ -167,10 +176,11 @@ public class InvoicePage extends JFrame {
                 printButton.setBackground(new Color(25, 118, 210)); // Đổi màu khi hover
             }
             public void mouseExited(java.awt.event.MouseEvent evt) {
-                printButton.setBackground(new Color(33, 150, 243));
+                printButton.setBackground(new Color(33, 150, 243)); // Trở lại màu gốc
             }
         });
         printButton.addActionListener(e -> {
+            // Hiển thị thông báo chưa kết nối máy in
             JOptionPane.showMessageDialog(this, "Chưa kết nối máy in", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
         });
         footerPanel.add(Box.createVerticalStrut(10));
@@ -184,32 +194,38 @@ public class InvoicePage extends JFrame {
         saveInvoiceToDatabase(invoiceCode, new Timestamp(System.currentTimeMillis()), "Đã thanh toán", currentUser.getUsername(), totalAmount);
     }
 
-    // Hàm lưu thông tin hóa đơn vào cơ sở dữ liệu
+    // Lưu thông tin hóa đơn vào cơ sở dữ liệu
     private void saveInvoiceToDatabase(String invoiceCode, Timestamp date, String status, String employeeName, double totalAmount) {
+        // Chuẩn bị truy vấn SQL để thêm hóa đơn
         String insertQuery = "INSERT INTO invoices (invoice_code, date, status, employee_name, total_amount) VALUES (?, ?, ?, ?, ?)";
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(insertQuery)) {
+            // Gán các tham số cho truy vấn
             preparedStatement.setString(1, invoiceCode);
             preparedStatement.setTimestamp(2, date);
             preparedStatement.setString(3, status);
             preparedStatement.setString(4, employeeName);
             preparedStatement.setDouble(5, totalAmount);
+            // Thực thi truy vấn để lưu hóa đơn
             preparedStatement.executeUpdate();
             System.out.println("Hóa đơn đã được lưu vào cơ sở dữ liệu.");
         } catch (Exception e) {
+            // Xử lý lỗi SQL và hiển thị thông báo lỗi
             e.printStackTrace();
             JOptionPane.showMessageDialog(this, "Lỗi khi lưu hóa đơn vào cơ sở dữ liệu.", "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    // Hàm định dạng thời gian
+    // Định dạng thời gian thành chuỗi dễ đọc
     private String formatDate(long timestamp) {
+        // Sử dụng SimpleDateFormat để định dạng thời gian thành "HH:mm dd/MM/yyyy"
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm dd/MM/yyyy");
         return sdf.format(new Date(timestamp));
     }
 
-    // Hàm tạo mã hóa đơn ngẫu nhiên
+    // Tạo mã hóa đơn ngẫu nhiên
     private String generateInvoiceCode() {
+        // Tạo số ngẫu nhiên từ 100 đến 99998 và thêm tiền tố "HD-"
         Random random = new Random();
         int invoiceNumber = 100 + random.nextInt(99999);
         return "HD-" + invoiceNumber;
